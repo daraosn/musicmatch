@@ -346,6 +346,8 @@ html, body {
 								DZ.api('/user/me', function(response) {
 									console.log('Good to see you, ' + response.name + '.');
 								});
+								
+								initGenres();
 							} else {
 								console.log('User cancelled login or did not fully authorize.');
 								}
