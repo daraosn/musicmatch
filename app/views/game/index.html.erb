@@ -1,129 +1,395 @@
-<script src="http://cdn-files.deezer.com/js/min/dz.js"></script>
-<div id="dz-root"></div>
-<script src="http://cdn-files.deezer.com/js/min/dz.js"></script>
-<script>
-function shuffle(o){ //v1.0
-    for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
-    return o;
-};
-
-$(function() {
-	DZ.init({
-		appId  : '106161',
-		channelUrl : '<%= root_url%>channel.html'
-	});
-
-	DZ.getLoginStatus(function(response) {
-	  if (response.authResponse) {
-			deezerLoad();
-	  } else {
-			DZ.login(function(response) {
-				if (response.authResponse) {
-					deezerLoad();
-				} else {
-					console.log('User cancelled login or did not fully authorize.');
-				}
-			}, {perms: 'email'});
-	  }
-	});
-});
-
-function deezerLoad() {
-	// deezerFetchUser();
-	deezerFetchGenres();
+<style>
+.navbar-inner .asdf {
+	padding-top: 12px;
+	float: right;
 }
 
-function deezerFetchUser() {
-	console.log('Welcome!  Fetching your information.... ');
-	DZ.api('/user/me', function(response) {
-		console.log('Good to see you, ' + response.name + '.');
-	});
+.content {
+	background: none !important;
+	box-shadow: none !important;
+	border-radius: none !important;
+	-webkit-border-radius: none !important;
+	-moz-border-radius: none !important;
+	margin-top: 25px;
 }
 
-function deezerFetchGenres() {
-	console.log('Fetching genres.... ');
-	DZ.api('/genre', function(response) {
-		$('#genres').html('')
-		if(response.data) {
-			for(var i in response.data) {
-				var $genre = $('<li>').html(response.data[i].name);
-				$genre.data('genreId', response.data[i].id);
-				$('#genres').append($genre);
-				$genre.click(function() {
-					console.log('Loading genre ' + $(this).data('genreId'));
-					DZ.api('/genre/' + $(this).data('genreId') + '/artists', function(response) {
-						if(response.data) {
-							var artists = shuffle(response.data);
-							// Continue here...
-						} else {
-							console.log("Error while parsing genre artists.")
-						}
-						console.log(response)
-					});
+html, body {
+	margin: 0;
+	padding: 0;
+	font: bold 16px "Helvetica";
+	height: 100%;
+}
+#wrap {
+	height: 100%;
+	width: 100%;
+}
+#start {
+	height: 100%;
+	text-align: center;
+	padding-top: 100px;
+}
+#genres {
+	width: 500px;
+	margin: 100px auto;
+}
+#genres li {
+	list-style: none !important;
+	float: left !important;
+	display: block !important;
+	background: #eee !important;
+	padding: 10px !important;
+	font-size: 20px !important;
+	margin: 10px !important;
+	color: #005580 !important;
+	text-decoration: underline !important;
+	cursor: pointer;
+}
+#playlist-length-wrap {
+	clear: both;
+	padding-top: 80px;
+}
+#playlist-length-wrap input {
+	margin-top: 30px;
+	width: 350px;
+}
+#select-artists, #end {
+	height: 100%;
+	width: 100%;
+	display: none;
+}
+#left-artist, #right-artist {
+	float: left;
+	height: 100%;
+	width: 50%;
+}
+.inner {
+	margin: 250px auto 0;
+	text-align: center;
+	width: 400px;
+	
+}
+#end li {
+	list-style: none;
+	line-height: 20px;
+}
+#end {
+	text-align: center;
+}
+#finish-alert {
+	display: none;
+}
+</style>
+
+
+			<div id="start"><!- START SCENARIO ->
+			
+				<h1>Make an effing playlist!</h1>
+				<h2>Select the effing genres you like</h2>
+				
+				<ul id="genres">
+					Loading....
+				</ul>
+				
+				<div id="playlist-length-wrap">
+					
+					<form action="index.html" method="post" accept-charset="utf-8">
+						<label for="playlistLength">How long is the effing playlist is going to be?</label><br/>
+						<input id="playlistLength" type="range" name="playlistLength" value="4" min="1" max="10">
+						<output for="playlistLength" onforminput="value = playlistLength.valueAsNumber;"></output>
+					</form>
+				</div>
+			</div>
+			
+			<div id="select-artists"> <!- SELECTING ARTISTS, (CONTINUE INNER CONTENT OF THIS DIV UNTIL USER HAS SELECTED 10) ->
+				<div id="left-artist">
+					
+					<div class="inner">
+						<img src="artwork.url">
+						
+						<h1><a href="#next" data-artist="artistID">I want some effing <span>Michael Jackson</span> songs in my playlist</a></h1>
+					</div>
+					
+				</div>
+				<div id="right-artist">
+					
+					<div class="inner">
+						<img src="artwork.url">
+						
+						<h1><a href="#next" data-artist="artistID">I want some effing <span>Michael Jackson</span> songs in my playlist</a></h1>
+					</div>
+					
+				</div>
+			</div>
+			
+			
+			<div id="end"><!- PLAYLIST IS CREATED, NOW NAME IT AND PREVIEW SONGS ->
+				
+				<div id="playlist-info">
+					<h1>Here's your effing <a href="linktoplaylist">playlist</a></h1>
+					<h2 id="finish-alert">Done! Check your Deezer playlists.</h2>
+					<form action="index.html" method="post" accept-charset="utf-8">
+						<div>
+							<label for="playlist-name">Give your playlist an effing name</label>
+						</div>
+						<div>
+							<input id="playlist-name" type="text" name="playlist-name" value="">
+						</div>
+						<div>
+							<button id="playlist-create">Create my playlist</button>
+						</div>
+					</form>	
+				</div>
+				
+				<div id="playlist-songs">
+					<ul id="playlist-songs-ul"></ul>
+				</div>				
+				
+				
+			</div>
+		<div id="dz-root"></div>
+			<script src="http://cdn-files.deezer.com/js/min/dz.js"></script>
+			<script>
+			
+			
+			function sortByFans(a, b){
+				return (parseInt(b.nb_fan, 10) - parseInt(a.nb_fan, 10)); //causes an array to be sorted numerically and ascending
+			}
+			
+			function sortByRandom() {
+				
+				return (0.5 - Math.random());
+			}
+			
+			function getArtistsByGenre(genreId, amount, callback) {
+				
+				DZ.api('/genre/' + genreId + '/artists', function(response) {
+					if(response.data) {
+						var artists = response.data.sort(sortByRandom).slice(0, amount);
+						
+						callback(artists);
+						
+					} else {
+						console.log("Error while parsing genre artists.")
+					}
+					console.log(response);
 				});
 			}
-		} else {
-			console.log("Error while parsing genres.")
-		}
-	});
-}
-</script>
-<div id="start">
-	<!-- START SCENARIO -->
-	<h1>Make an effing playlist!</h1>
-	<h2>Select the effing genres you like</h2>
-	<ul id="genres">
-		Loading genres...
-	</ul>
-	<div id="playlist-length-wrap">
-		<form action="index.html" method="post" accept-charset="utf-8">
-			<label for="playlistLength">Select how long the effing playlist is going to be</label>
-			<input id="playlistLength" type="range" name="playlistLength" value="4" min="1" max="10">
-			<output for="playlistLength" onforminput="value = playlistLength.valueAsNumber;"></output>
-		</form>
-	</div>
-</div>
-<div id="select-artists">
-	<!-- SELECTING ARTISTS, (CONTINUE INNER CONTENT OF THIS DIV UNTIL USER HAS SELECTED 10) -->
-	<div id="left-artist">
-		<div class="inner">
-			<img src="artwork.url">
-			<h1><a href="#next" data-artist="artistID">I want some effing <span>Michael Jackson</span> songs in my playlist</a></h1>
-		</div>
-	</div>
-	<div id="right-artist">
-		<div class="inner">
-			<img src="artwork.url">
-			<h1><a href="#next" data-artist="artistID">I want some effing <span>Michael Jackson</span> songs in my playlist</a></h1>
-		</div>
-	</div>
-	<div id="skip-choise">
-		<a href="#next">I don't effing like any of these artists.</a>
-	</div>
-</div>
-<div id="end">
-	<!-- PLAYLIST IS CREATED, NOW NAME IT AND PREVIEW SONGS -->
-	<div id="playlist-info">
-		<h1>Here's your effing <a href="linktoplaylist">playlist</a></h1>
-		<form action="index.html" method="post" accept-charset="utf-8">
-			<label for="playlist-name">Give your playlist an effing name</label>
-			<input id="playlist-name" type="text" name="playlist-name" value="">
-		</form>
-	</div>
-	<div id="playlist-songs">
-		<ul>
-			<li>
-				<a href="linktoartist">Artist</a> - <a href="linktosong">Song</a>
-			</li>
-			<li>
-				<a href="linktoartist">Artist</a> - <a href="linktosong">Song</a>
-			</li>
-			<li>
-				<a href="linktoartist">Artist</a> - <a href="linktosong">Song</a>
-			</li>
-			<li>
-				<a href="linktoartist">Artist</a> - <a href="linktosong">Song</a>
-			</li>
-		</ul>
-	</div>
-</div>
+			
+			
+			function getRelatedArtists(artistId, amount) {
+			
+				DZ.api('/artist/' + artistId + '/related', function(relatedArtists){
+							
+					var topRelatedArtist = getTopAritsts(relatedArtists.data, amount);
+					
+					//console.log("topRelatedArtist", topRelatedArtist);
+					
+					getTracksFromArtists(topRelatedArtist);
+				});
+			}
+			
+			function getTopAritsts(artists, amount){
+				
+				return artists.sort(sortByFans).slice(0, amount);
+			}
+	
+			
+			function getTracksFromArtists(topRelatedArtist) {
+				
+				var allTracks = [],
+					flags = 0;
+				
+				for(artist in topRelatedArtist) {
+					
+					DZ.api('/artist/' + topRelatedArtist[artist].id + '/top', function(artistTracks){
+						allTracks.push(artistTracks.data);
+						flags++;
+						
+						if(flags === topRelatedArtist.length) {
+							
+							makePlaylistMatchTime(_.flatten(allTracks), 60*60*5); // 5 hours in secs
+						}
+					});			
+				}
+			}
+			
+			
+			var playlistTracks = [],
+				currentTime = 0;
+			
+			
+			function makePlaylistMatchTime(tracks, maxTime){
+				
+				//console.log("makePlaylistMatchTime", tracks);
+							
+				tracks = tracks.sort(sortByRandom); // By random
+				
+				for(track in tracks) {
+					
+					window.currentTime += parseInt(tracks[track].duration);
+					
+					window.playlistTracks.push(tracks[track]);
+								
+					if(currentTime >= maxTime) {
+						
+						
+						presentSongs();
+						break;
+					}
+				}
+	
+				console.log(currentTime, maxTime);
+			}
+			
+			function makeMash(pos) {
+				
+				var text = "I want some effing <span>{name}</span> songs in my playlist";
+				
+				if(!window.artists[window.pos]) {
+					
+					showResults();
+					return;
+				}
+				
+				$(".inner").each(function(i){
+					
+					$(this).find("h1").find("a").html(text.replace("{name}", window.artists[window.pos].name)).data("artist", window.artists[window.pos].id)
+					
+					
+					$(this).find("img").attr("src", window.artists[window.pos].picture)
+					window.pos++;
+				});
+				
+				
+			}
+			
+			function deezerCreatePlaylist(name, tracks) {
+				DZ.api('/user/me/playlists?request_method=post&title='+name, function(response) {
+					if(response.id) {
+						var playlistId = response.id;
+						console.log('new playlist id: '+ response.id)
+						var trackList="";
+						for(var i in tracks) {
+							trackList += tracks[i]['id'] + ",";
+						}
+						console.log('adding songs: '+ trackList);
+						DZ.api('/playlist/' + playlistId + '/tracks?request_method=post&songs='+trackList, function(response) {
+							console.log(response);
+							$('#finish-alert').fadeIn();
+						})
+					} else {
+						alert('Whoa, error!');
+					}
+				});
+			}
+			
+			function showResults(){
+				
+				for(artist in window.favArtists) {
+					
+					getRelatedArtists(window.favArtists[artist]);
+				}
+				
+				
+			}
+			
+			var presIsRun = false;
+			
+			function presentSongs(){
+				
+				if(presIsRun) return;
+				
+				presIsRun = true;
+				
+				playlistTracks = playlistTracks.sort(sortByRandom);
+				
+				console.log("pressnt", playlistTracks)
+				
+				$("#select-artists").fadeOut();
+				$("#end").fadeIn();
+				$("#end").find("h1").html('Here\'s your effing <a href="linktoplaylist">playlist</a> (' + (Math.round(currentTime/(60*60))) + ' h)')
+				
+				for(track in playlistTracks) {
+					$("#playlist-songs-ul").append(
+					'<li>' + playlistTracks[track].artist.name + ' - ' + playlistTracks[track].title + '</li>'
+					)	;
+					
+				}
+				
+				$('#playlist-create').click(function(e) {
+					deezerCreatePlaylist($('#playlist-name').val(), playlistTracks);
+					e.preventDefault();
+					return false;
+				});
+				
+			}
+			
+			
+			
+			DZ.init({
+				appId  : "106161",
+				channelUrl : "http://music-match.herokuapp.com:3000/channel.html"
+			});
+			 
+			 
+			 DZ.getLoginStatus(function(response) {
+				if (response.authResponse) {
+		
+						//getRelatedArtists(27, 10);
+						initGenres();
+					} else {
+					// no user session available, someone you dont know
+						DZ.login(function(response) {
+							if (response.authResponse) {
+									
+								console.log('Welcome!  Fetching your information.... ');
+								DZ.api('/user/me', function(response) {
+									console.log('Good to see you, ' + response.name + '.');
+								});
+							} else {
+								console.log('User cancelled login or did not fully authorize.');
+								}
+							}, {perms: ['email', 'manage_library']}
+						);
+					}
+				});
+			
+				var favArtists = [];
+			
+				function initGenres(){
+					
+					DZ.api('/genre', function(response) {
+						$('#genres').html('')
+						if(response.data) {
+							for(var i in response.data) {
+								var $genre = $('<li>').html(response.data[i].name);
+								$genre.data('genreId', response.data[i].id);
+								$('#genres').append($genre);
+								$genre.click(function() {
+									console.log('Loading genre ' + $(this).data('genreId'));
+									getArtistsByGenre($(this).data('genreId'), 20, function(artists){
+										
+										$("#start").fadeOut();
+										$("#select-artists").fadeIn();
+										
+										window.artists = artists;
+										window.pos = 0;
+										
+										makeMash();
+										
+										$(".inner").find("a").click(function(e){
+											
+											e.preventDefault();
+											favArtists.push($(this).data("artist"));
+											
+											makeMash();
+										})
+									})
+								});
+							}
+						} else {
+							console.log("Error while parsing genres.");
+						}
+					});
+				}
+			</script>
