@@ -1,1 +1,129 @@
-Hey
+<script src="http://cdn-files.deezer.com/js/min/dz.js"></script>
+<div id="dz-root"></div>
+<script src="http://cdn-files.deezer.com/js/min/dz.js"></script>
+<script>
+function shuffle(o){ //v1.0
+    for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+    return o;
+};
+
+$(function() {
+	DZ.init({
+		appId  : '106161',
+		channelUrl : '<%= root_url%>channel.html'
+	});
+
+	DZ.getLoginStatus(function(response) {
+	  if (response.authResponse) {
+			deezerLoad();
+	  } else {
+			DZ.login(function(response) {
+				if (response.authResponse) {
+					deezerLoad();
+				} else {
+					console.log('User cancelled login or did not fully authorize.');
+				}
+			}, {perms: 'email'});
+	  }
+	});
+});
+
+function deezerLoad() {
+	// deezerFetchUser();
+	deezerFetchGenres();
+}
+
+function deezerFetchUser() {
+	console.log('Welcome!  Fetching your information.... ');
+	DZ.api('/user/me', function(response) {
+		console.log('Good to see you, ' + response.name + '.');
+	});
+}
+
+function deezerFetchGenres() {
+	console.log('Fetching genres.... ');
+	DZ.api('/genre', function(response) {
+		$('#genres').html('')
+		if(response.data) {
+			for(var i in response.data) {
+				var $genre = $('<li>').html(response.data[i].name);
+				$genre.data('genreId', response.data[i].id);
+				$('#genres').append($genre);
+				$genre.click(function() {
+					console.log('Loading genre ' + $(this).data('genreId'));
+					DZ.api('/genre/' + $(this).data('genreId') + '/artists', function(response) {
+						if(response.data) {
+							var artists = shuffle(response.data);
+							// Continue here...
+						} else {
+							console.log("Error while parsing genre artists.")
+						}
+						console.log(response)
+					});
+				});
+			}
+		} else {
+			console.log("Error while parsing genres.")
+		}
+	});
+}
+</script>
+<div id="start">
+	<!-- START SCENARIO -->
+	<h1>Make an effing playlist!</h1>
+	<h2>Select the effing genres you like</h2>
+	<ul id="genres">
+		Loading genres...
+	</ul>
+	<div id="playlist-length-wrap">
+		<form action="index.html" method="post" accept-charset="utf-8">
+			<label for="playlistLength">Select how long the effing playlist is going to be</label>
+			<input id="playlistLength" type="range" name="playlistLength" value="4" min="1" max="10">
+			<output for="playlistLength" onforminput="value = playlistLength.valueAsNumber;"></output>
+		</form>
+	</div>
+</div>
+<div id="select-artists">
+	<!-- SELECTING ARTISTS, (CONTINUE INNER CONTENT OF THIS DIV UNTIL USER HAS SELECTED 10) -->
+	<div id="left-artist">
+		<div class="inner">
+			<img src="artwork.url">
+			<h1><a href="#next" data-artist="artistID">I want some effing <span>Michael Jackson</span> songs in my playlist</a></h1>
+		</div>
+	</div>
+	<div id="right-artist">
+		<div class="inner">
+			<img src="artwork.url">
+			<h1><a href="#next" data-artist="artistID">I want some effing <span>Michael Jackson</span> songs in my playlist</a></h1>
+		</div>
+	</div>
+	<div id="skip-choise">
+		<a href="#next">I don't effing like any of these artists.</a>
+	</div>
+</div>
+<div id="end">
+	<!-- PLAYLIST IS CREATED, NOW NAME IT AND PREVIEW SONGS -->
+	<div id="playlist-info">
+		<h1>Here's your effing <a href="linktoplaylist">playlist</a></h1>
+		<form action="index.html" method="post" accept-charset="utf-8">
+			<label for="playlist-name">Give your playlist an effing name</label>
+			<input id="playlist-name" type="text" name="playlist-name" value="">
+		</form>
+	</div>
+	<div id="playlist-songs">
+		<ul>
+			<li>
+				<a href="linktoartist">Artist</a> - <a href="linktosong">Song</a>
+			</li>
+			<li>
+				<a href="linktoartist">Artist</a> - <a href="linktosong">Song</a>
+			</li>
+			<li>
+				<a href="linktoartist">Artist</a> - <a href="linktosong">Song</a>
+			</li>
+			<li>
+				<a href="linktoartist">Artist</a> - <a href="linktosong">Song</a>
+			</li>
+		</ul>
+	</div>
+</div>
