@@ -8,10 +8,10 @@ class User
   field :last_name, :type => String
   field :email, :type => String
   field :image, :type => String
-  field :active, :type => Boolean
+  field :banned, :type => Boolean, :default => false
   attr_accessible :name, :email
   
-  # has_many :playlists, :class_name => "Playlists", :foreign_key => "user_id", :inverse_of => :user
+  has_many :playlists, :class_name => "Playlist", :foreign_key => "user_id", :inverse_of => :user
   
   # run 'rake db:mongoid:create_indexes' to create indexes
   index({ email: 1 }, { unique: true, background: true })
