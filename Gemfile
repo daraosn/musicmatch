@@ -35,3 +35,13 @@ gem 'jquery-rails'
 
 # To use debugger
 # gem 'debugger'
+
+gem "thin", ">= 1.4.1"
+gem "mongoid", ">= 3.0.5"
+gem "rspec-rails", ">= 2.11.0", :group => [:development, :test]
+gem "capybara", ">= 1.1.2", :group => :test
+gem "database_cleaner", ">= 0.8.0", :group => :test
+gem "mongoid-rspec", ">= 1.4.6", :group => :test
+gem "bootstrap-sass", ">= 2.1.0.0"
+gem "omniauth", ">= 1.1.1"
+gem "omniauth-facebook"
