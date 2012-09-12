@@ -7,6 +7,7 @@ class SessionsController < ApplicationController
 
   def create
     auth = request.env["omniauth.auth"]
+    abort auth.inspect
     user = User.where(:provider => auth['provider'], 
                       :facebook_id => auth['facebook_id'].to_s).first || User.create_with_omniauth(auth)
     session[:user_id] = user.id
